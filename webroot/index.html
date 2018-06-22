@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>用户登陆界面</title>
+<link rel="stylesheet" type="text/css" href="login.css"/>
+</head> 
+<body background="test/css/img103.png">	
+	<div id="div1">
+	 <h3>欢迎使用作业提交系统</h3>
+     <form method="post" action="test/login.php"> 
+     <input type="char" required="required" placeholder="用户名" name="username">
+     <input type="password" required="required" placeholder="密码" name="password">
+    <div class="choice">  
+    <label class="radio">教师<input type="radio" name="radio1" value="teacher"><i></i></label>  
+    <label class="radio">学生<input type="radio" name="radio1" value="student"><i></i></label>  
+    </div> 
+     <p><button class="but" type="submit">登录</button></p>
+	 <p><button class="but" type="reset">重置</button></p>
+     <a href="test/register.html">没有账号，注册</a>	
+     </form>	
+	</div>
+</body>
+</html>

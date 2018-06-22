@@ -1,0 +1,89 @@
+@charset "utf-8";
+/* CSS Document */
+
+*{margin: 0px;}
+.head{
+	position: relative;
+	background-color: turquoise;
+	width: inherit;
+	height:50px;
+}
+#body{
+	align-content: center;
+	position: absolute;
+}
+#span1{
+	position: absolute;
+	left:10px;
+	top: 10px;
+}
+#select1{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+#userlist{
+	position: absolute;
+	width: 120px;
+	height:330px;
+	border: #000000;
+	left: 10px;
+}
+#usericon{
+	background-color: aquamarine;
+	width: 220px;
+	height: 150px;
+}
+#list{
+	background-color: beige;
+	width: 220px;
+	height: 300px;
+}
+#upload{
+    position: absolute;
+	top: 10px;
+}
+#workarea{
+	position: absolute;
+	left: 250px;
+	width:900px;
+	height:400px;
+	overflow:auto;
+	border:4px double #1B1011;
+}
+#notice_upload{
+	position: absolute;
+	width: 370px;
+	height:400px;
+	border: #000000;
+	left: 1200px;
+	border:4px double #1B1011;
+	overflow:auto;
+}
+
+input{
+	      float: left;
+        width: 50;   
+        height: 10px;   
+        margin-bottom: 10px;   
+        outline: none;   
+        padding: 10px;   
+        font-size: 13px;   
+        color:#B6B6B6   ;
+        text-shadow:1px 1px 1px;   
+        border-top: 1px solid #312E3D;   
+        border-left: 1px solid #312E3D;   
+        border-right: 1px solid #312E3D;   
+        border-bottom: 1px solid #56536A;   
+        border-radius: 4px;      
+  
+}
+#anwser{
+	position: absolute;
+	align-content: center;
+	top: 500px;
+	left: 500px;
+	width: 500px;
+	height: 250px;
+	
+}

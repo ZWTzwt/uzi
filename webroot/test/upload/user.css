@@ -1,0 +1,62 @@
+@charset "utf-8";
+/* CSS Document */
+
+*{margin: 0px;}
+.head{
+	position: relative;
+	background-color: turquoise;
+	width: inherit;
+	height:50px;
+}
+#span1{
+	position: absolute;
+	left:10px;
+	top: 10px;
+}
+#select1{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+#userlist{
+	position: absolute;
+	width: 220px;
+	height:330px;
+	border: #000000;
+	left: 10px;
+}
+#usericon{
+	background-color: aquamarine;
+	width: 220px;
+	height: 150px;
+}
+#list{
+	background-color: beige;
+	width: 220px;
+	height: 180px;
+}
+#lessons{
+	position: absolute;
+	left: 300px;
+	width: 500px;
+	height: 500px;
+	border:4px double #1B1011;
+}
+.Mylesson{
+	border:4px double #1B1011;
+	position: relative;
+	background: #EAD4D4;
+	width: auto;
+	height: auto;
+	float: left;
+	left: 10px;
+	top: 10px;
+	right: 10px;
+}
+#add{
+	position: absolute;
+	right: 0px;
+}
+.a{
+	position: absolute;
+}

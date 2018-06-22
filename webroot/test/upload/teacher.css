@@ -1,0 +1,78 @@
+@charset "utf-8";
+/* CSS Document */
+
+.mainItem{
+	float: left;
+	left: 20px;
+}
+#worklist{
+	position: absolute;
+	width:inherit;
+	height: 50px;
+}
+#body{
+	position: absolute;
+	top: 70px;
+}
+*{margin: 0px;}
+.head{
+	position: relative;
+	background-color: turquoise;
+	width: inherit;
+	height:50px;
+}
+#span1{
+	position: absolute;
+	left:10px;
+	top: 10px;
+}
+#select1{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+#userlist{
+	position: absolute;
+	width: 120px;
+	height:330px;
+	border: #000000;
+	left: 10px;
+}
+#usericon{
+	background-color: aquamarine;
+	width: 220px;
+	height: 150px;
+}
+#list{
+	background-color: beige;
+	width: 220px;
+	height: 300px;
+}
+#upload{
+    position: absolute;
+	left: 450px;
+	top: 450px;
+}
+#workarea{
+	position: absolute;
+	left: 250px;
+	width:1000px;
+	height:400px;
+	overflow:auto;
+	border:4px double #1B1011;
+}
+#notice{
+	position: absolute;
+	width: 220px;
+	height:330px;
+	border: #000000;
+	right: 10px;
+	border:4px double #1B1011;
+}
+#flash{
+	position: absolute;
+	bottom: 20px;
+	border: #968283;
+	width: 50px;
+	height: 50px;
+}

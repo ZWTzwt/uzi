@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>用户注册</title>
+<link rel="stylesheet" type="text/css" href="../login.css"/>
+</head> 
+<body background="css/img103.png">	
+	<div id="div1">
+	 <h3>欢迎使用作业提交系统</h3>
+     <form method="post" action="register.php">
+		 <input type="char" required="required" placeholder="姓名" name="name">
+		 <input type="char" required="required" placeholder="学号" name="number">
+     <input type="char" required="required" placeholder="用户名" name="username">
+     <input type="password" required="required" placeholder="密码" name="password">
+     <input type="password" required="required" placeholder="密码确认" name="password2">
+	 <div class="choice">  
+    <label class="radio">教师<input type="radio" name="radio1" value="teacher"><i></i></label>  
+    <label class="radio">学生<input type="radio" name="radio1" value="student"><i></i></label>  
+    </div> 
+     <p><button class="but" type="submit">注册</button></p>
+	 <p><button class="but" type="reset">重置</button></p>	
+     </form>	
+	</div>
+</body>
+</html>

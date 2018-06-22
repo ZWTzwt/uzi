@@ -1,0 +1,376 @@
+数据库：https://wenku.baidu.com/view/1544257af342336c1eb91a37f111f18583d00c24.html
+https://wenku.baidu.com/view/4f91070f4a7302768e99396d.html?sxts=1529029886344
+https://wenku.baidu.com/view/733b06d4d4bbfd0a79563c1ec5da50e2534dd144.html?rec_flag=default&sxts=1529029982699
+登录界面：https://blog.csdn.net/u011526599/article/details/51477406#t8
+数据库表：https://wenku.baidu.com/view/96b6f01f6bd97f192279e9c1.html?sxts=1529030039718
+
+存储过程
+use sct
+go
+
+
+--1创建一个加密存储过程，从学生选课数据库中查询学号,姓名,课程名和成绩。并用sp_helptext查看该存储过程。
+
+create proc  p_sjm with encryption
+as select s.snum,s.sname,c.cname,sc.score from sc,s,c
+where sc.snum=s.snum and c.cnum=sc.cnum
+go
+
+exec sp_helptext p_sjm 
+go
+
+
+--2.创建一存储过程，完成向课程表（C）中插入一条记录，记录值通过输入参数传递到存储过程中
+
+create proc p_insc
+(@kch nchar(12),
+@kcm nvarchar(50),
+@xf numeric(5,1))
+as insert into c values(@kch,@kcm,@xf)
+go
+select * from c where cnum like 'c%'--查询选课情况
+exec p_insc 'c11','J2EE',2.5
+go
+
+
+--3.创建一存储过程，显示某一同学的平均成绩，学号通过输入参数传递到存储过程中，并执行该存储过程
+
+create proc p_pjcj(@xh nchar(12) output)
+as select avg(sc.score) from sc where  sc.snum=@xh
+go
+
+select * from sc --查询学号情况
+exec p_pjcj '201404010130 '
+go
+
+--4.创建一存储过程，在删除学院COLL表时,同时删除该学院的教师T以及教师的任课记录TC;同时删除该学院的所
+
+--有专业D，该专业的所有学生S以及学生所选修的课程SC，输入参数为学院编号。并执行该存储过程。
+
+create proc p_sc5(@xybh nchar(2))
+as
+
+--删除课程表
+
+delete from sc where sc.snum in(select s.snum from s where s.dnum in(select dnum from d where d.collnum=@xybh))
+
+--删除学生表
+
+delete from s where s.dnum in(select dnum from d where d.collnum=@xybh)
+
+--删除专业表
+
+delete from d where d.collnum=@xybh
+
+--删除教师任课记录
+
+delete from tc where tc.tnum in (select t.tnum from t where collnum=@xybh)
+
+--删除教师表
+
+delete from t where t.collnum=@xybh
+
+--删除学院表
+
+delete from coll where coll.collnum=@xybh
+go
+
+select * from t where t.collnum='10' --查询学院情况
+exec p_sc5 '10 '
+
+go
+
+触发器
+--1.(1)在选课表SC上创建触发器，当向该表中插入记录时，若学生选课门数超过５门时，则向客户端发出警告信息，同时将插入记录自动删除。
+
+create trigger sc_T on sc
+after insert as
+if(select count(*) from sc,inserted where sc.snum=inserted.snum)>5
+begin
+print '你选课的课程已经超过五门，不能再选了！'
+rollback
+end
+else
+print '选课成功！'
+go
+
+
+  --(2)验证该触发器。
+
+select * from sc where snum='201511010115'
+insert into sc values('201511010115','c02',null)
+go
+
+
+--2.(1)创建一触发器,在对学生的姓名进行更新时，显示更新前后的学生姓名。
+
+create trigger s_xm on s
+after update as
+if update(sname)
+begin
+select sname '前' from deleted
+select sname '后' from inserted
+end
+
+go
+
+--（2）更新自己的姓名验证该触发器是否生效。
+
+select * from s where snum='201511010115'
+update s
+set sname= '何雷'
+where snum='201511010115'
+go
+
+
+--3.(1)建立一个触发器,在向 “ 教师 ” 表插入记录时引发该触发器,检查所插入元组中教师的工资是否大于4000元,且小于10000元,
+--若不是则提示用户“工资必须大于4000元 ,小于10000 元”,并且回滚事务。
+
+create trigger t_gz3 on t
+after insert as
+if (select tsalary from inserted)not between 4000 and 10000
+begin
+print  '工资必须大于4000元 ,小于10000 元'
+rollback
+end
+else
+print '插入成功！'
+go
+
+drop trigger t_gz3
+
+  --(2)插入一个老师信息，设定工资为3800元，测试该触发器。
+
+select * from t where tnum='20170002'
+insert into t(tname,tnum,tsalary) values('20170002','张2','4800')
+go
+
+--4.(1)创建一个触发器tri_t1,禁止删除工号为20020074的教师。
+
+create trigger tri_t1 on t
+after delete as
+if (select tnum from deleted)='20020074
+begin
+print  '禁止删除!'
+rollback
+end
+else
+print '删除成功'
+go
+
+  --(2)删除工号为“20020074”的教师，验证该触发器。
+
+select * from t where tnum='20020074'
+delete from tc where tnum='20020074'
+delete from t where tnum='20020074'
+go
+
+--5.(1)创建一触发器实现级联删除。在删除学院(coll)表时,同时删除该学院的教师及其任课记录，该学院的系，所属系的学生以及选修记录。
+
+create trigger coll_xy on coll
+instead of delete as
+delete sc where sc.snum in (select s.snum from s where s.dnum in (select d.dnum from d where collnum in(select coll.collnum from coll,deleted where coll.collnum=deleted.collnum)))
+delete s where s.dnum in (select d.dnum from d where collnum in(select coll.collnum from coll,deleted where coll.collnum=deleted.collnum))
+delete tc where tc.tnum in (select coll.tnum from coll,deleted where coll.collnum=deleted.collnum)
+delete t where t.collnum in (select coll.tnum from coll,deleted where coll.collnum=deleted.collnum)
+begin
+print  '删除该学院的教师及其任课记录，该学院的系，所属系的学生以及选修记录!'
+rollback
+end
+go
+
+drop trigger coll_xy
+
+  --(2)删除某一学院，验证该触发器。
+
+  select * from coll
+  delete from coll where collnum='10'
+
+
+流程控制：
+use sct
+go
+
+--1.变量与函数的应用
+--(1)定义两个变量，将sc表中的最高分和最低分分别赋值给这两个变量，并显示变量值。
+declare @max int
+declare @min int
+select @max=(select MAX(score) from sc)
+select @min=(select MIN(score) from sc)
+print @max
+print @min
+go
+
+--2.while循环
+--(1)求整数0到100的和，并且屏幕输出。（while 循环）
+declare @i int,@sum int
+set @i=1
+set @sum=0
+while @i<101
+begin
+set @sum=@sum+@i
+set @i=@i+1
+en
+print '整数0到100的和:'
+print @sum
+go
+
+--(2)在数据库中创建一个表nums(number int primary key),并为这张表从1到1000，填充1000行数据。
+create table nums(number int primary key)
+declare @m int 
+declare @number int
+set @m=1
+set @number=0
+while @m<1001
+begin
+insert into nums(number
+values(@m)
+set @m=@m+1
+end
+go
+select * from nums
+
+--3.if...else
+--从T（教师表）中求出‘信息工程学院’教师的平均工资，如果平均工资大于6000，则输出‘工资高于平均水平’，否则输出‘工资低于平均水平’。
+if(select avg(tsalary) from t,coll where coll.collname='信息工程学院'and t.collnum=coll.collnum)>6000
+print '工资高于平均水平'
+else print '工资低于平均水平'
+go
+
+--4.case
+--(1).从教师表T中，选取tnum,tname,tsex,titile, 如果Ttitle为‘教授’,则显示‘正高级’,如果为‘副教授’，则显示‘副高级’，
+--如果为‘讲师’，则显示‘中级’，如果为助教，则显示‘初级’,否则显示‘其他情况’。
+select tnum,tname,tsex,ttitle,(
+case
+when ttitle='教授' then '正高级'
+when ttitle='副教授' then  '副高级'
+when ttitle='讲师' then  '中级'
+when ttitle='助教' then  '初级'
+else  '其他情况'
+end )from t
+go
+
+--(2).查询教师的姓名,性别和年龄(表中为Tbirth出生日期),年龄小于30岁,显示年龄偏小,30到55岁之间(包括边界值),显示年龄居中,
+--大于55岁,显示年龄偏大。(提示:使用datediff()和getdate()函数)
+select tname,tsex,datediff(year,tbirth,getdate()) as nl from t
+select tname,tsex,(
+case
+when datediff(year,tbirth,getdate())<30 then '年龄偏小'
+when datediff(year,tbirth,getdate())<55 then  '年龄居中'
+when datediff(year,tbirth,getdate())>=55 then  '年龄偏大'
+else '年龄未知'
+end )as nlqk  from t
+go
+
+
+视图
+--一.创建视图
+--1.创建一个视图VIEW_S，显示成绩等于100分的学生的学号、姓名、课程名和成绩。
+create view v_score100
+as
+select s.snum,sname,c.cnum,score from sc,c,s
+where s.snum=sc.snum and sc.cnum=c.cnum and sc.score='100'
+
+--2.建立‘信息与计算科学’专业选修了‘数据库原理与技术’这门课程的学生视图。（学号，姓名，成绩
+create view v_cnumqk
+as
+select d.dnum,dname,score from s,d,sc,c
+where sc.snum=s.snum and c.cnum=sc.cnum and s.snum=d.dnum and d.dname='信息与计算科学' and c.cnum='数据库原理与技术'
+
+--3.建立‘信息与计算科学’专业选修了‘数据库原理与技术’这门课程且成绩在90分以上的学生视图。（学号，姓名，成绩）
+create view v_score90
+as
+select d.dnum,dname,score from s,d,sc,c
+where sc.snum=s.snum and c.cnum=sc.cnum and s.snum=d.dnum and d.dname='信息与计算科学' and c.cnum='数据库原理与技术' and score>90
+
+--要求创建基于视图的视图。
+--4.建立‘信息管理与信息系统’专业的学生的学号，姓名和平均成绩的视图。
+create view v_pjcj1(snum,sname,pjcj)
+as
+select s.snum,s.sname,avg(sc.score) as picj from sc,d,s
+where sc.snum=s.snum and s.dnum=d.dnum and d.dname='信息管理与信息系统' 
+group by s.snum,s.sname
+go
+
+select * from v_pjcj1
+
+--5.将学院名称及该学院教师的平均工资定义为一个视图。
+create view v_xygz(xymc,jspjgz)
+as
+select collname,avg(tsalary) from coll,t
+where coll.collnum=t.collnum
+group by coll.collname
+go
+select * from v_xygz
+
+--6.建立一视图显示教师的工号，姓名和年龄。（可考虑用datediff()函数）
+create view v_js(gh,xm,nl)
+as
+select tnum,tname,datediff(year,tbirth,getdate()) from t
+go
+select * from v_js
+
+--7.建立一视图，按照教师的工号和姓名统计其所教授的课程数。
+create view v_jskcs(gh,xm,kcs)
+as
+select  t.tnum,t.tname,count(*)from t,tc
+where t.tnum=tc.tnum
+group by t.tname,t.tnum
+go
+select * from v_jskcs
+
+--8.建立一视图，按照学院编号和学院名称统计每个学院的专业数。
+create view v_xyzys(xybh,xymc,zys)
+as
+select coll.collnum,coll.collname,count(*) from coll,d
+where d.collnum=coll.collnum
+group by coll.collnum,collname
+go
+select * from v_xyzys
+
+--9.建立一视图，显示 专业号为‘1101’专业学生的学号、姓名、性别、和专业号。
+create view v_1101(xh,xm,xb,zy)
+as
+select snum,sname,ssex,dnum from s
+where dnum='1101'
+go
+select * from v_1101
+
+--二.查询视图
+--根据以上创建的视图4查询：
+--1.查询信息管理与信息系统专业平均成绩大于90分的学生的学号、姓名和平均成绩。
+select snum,sname,pjcj from v_pjcj1 where pjcj>90
+
+--根据以上创建的视图6查询：
+--2.查询年龄小于30岁的教师的工号和姓名。
+select gh,xm from v_js where nl<30
+
+--三.视图的更新
+--根据视图9完成下列操作：
+--1.将学号为“201511010115 ”的同学姓名改为“何雷”。
+update v_1101
+set xm='何雷'
+where xh='201511010115'
+
+--2.插入一个新的学生记录，其中学号为‘201711010101’，姓名为'刘晨'，性别为‘男’，专业号为‘1101’。
+insert into v_1101
+values('201711010101','刘晨','男','1101')
+
+--3.删除学号为‘200508082121’的学生记录。
+delete from sc where snum='200508082121'
+delete from v_1101 where xh='200508082121'
+
+--4.视图的删除
+--删除以上创建的视图3,删除视图3后，实验视图2是否可用？为什么？
+drop view v_score90
+select * from v_cnumqk
+/*
+可用
+视图是虚表，视图之间互不干扰，数据库中只存放定义，不存放视图对应的数据,视图中的数据并不实际存储
+
+*/
+
+
+
+
+
